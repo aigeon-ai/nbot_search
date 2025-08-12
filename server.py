@@ -11,24 +11,26 @@ from fastmcp import FastMCP, Context
 import os
 from dotenv import load_dotenv
 load_dotenv()
-nbot_api_key = os.getenv("NBOT_API_KEY")
+rapid_api_key = os.getenv("RAPID_API_KEY")
+
+__rapidapi_url__ = 'https://rapidapi.com/particle-media-particle-media-default/api/aigeon-web-search'
 
 mcp = FastMCP('nbot_search')
 
 @mcp.tool()
-def nbot_search(query: Annotated[str, Field(description='query to search for nbot answer')],
-                     zipcode: Annotated[Union[str, None], Field(description='zipcode of the user is doing the search')] = None,
-                time_sensitive: Annotated[Union[bool, None], Field(description='time sensitive answer or not')] = None):
+def nbot_search(query: Annotated[str, Field(description='Search query for nbot answer.')],
+                     zipcode: Annotated[Union[str, None], Field(description='The zipcode of the user doing the search.')] = None,
+                time_sensitive: Annotated[Union[bool, None], Field(description='The query is time sensitive or not.')] = None):
     '''Search with nbot for news results'''
-    url = 'http://agentsdk.ai/mcp/search'
-    headers = {'X-Origin-ID': 'mcp', 'X-API-Key': nbot_api_key}
+    url = 'https://aigeon-web-search.p.rapidapi.com/aigeon_search'
+    headers = {'x-rapidapi-host': 'aigeon-web-search.p.rapidapi.com', 'x-rapidapi-key': rapid_api_key}
     payload = {
         'query': query,
         'zipcode': zipcode,
         'time_sensitive': time_sensitive
     }
     payload = {k: v for k, v in payload.items() if v is not None}
-    response = requests.get(url, headers=headers, params=payload)
+    response = requests.post(url, headers=headers, json=payload)
     return response.json()
 
 
